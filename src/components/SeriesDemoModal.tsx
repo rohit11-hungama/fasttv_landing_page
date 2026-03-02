@@ -1,27 +1,42 @@
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { assets } from '../assets/figma_assets';
 import type { Show } from './ContentRow';
 import { X, VolumeX, Volume2 } from 'lucide-react';
 import StoreButtons from './StoreButtons';
+import { useHlsVideo } from '../hooks/useHlsVideo';
 
 interface SeriesDemoModalProps {
     isOpen: boolean;
-    onClose: () => void;
+    onClose: (currentTime?: number) => void;
     show: Show | null;
+    /** If provided, plays video instead of static poster */
+    videoUrl?: string | null;
+    /** Time (seconds) to start playback from */
+    startTime?: number;
 }
 
-export default function SeriesDemoModal({ isOpen, onClose }: SeriesDemoModalProps) {
+export default function SeriesDemoModal({ isOpen, onClose, show, videoUrl, startTime }: SeriesDemoModalProps) {
     const [showContent, setShowContent] = useState(false);
-    const videoRef = useRef<HTMLVideoElement>(null);
-    const [isMuted, setIsMuted] = useState(true);
+
+    // Video playback inside modal (only when videoUrl provided)
+    const {
+        videoRef: modalVideoRef,
+        isMuted: modalMuted,
+        hasAudio: modalHasAudio,
+        toggleMute: toggleModalMute,
+    } = useHlsVideo({
+        src: isOpen ? (videoUrl ?? null) : null,
+        autoPlay: true,
+        startTime,
+    });
 
     // Reset state when modal opens
     useEffect(() => {
         if (isOpen) {
             setShowContent(false);
-            setIsMuted(true);
             document.body.style.overflow = 'hidden';
         } else {
             document.body.style.overflow = 'unset';
@@ -31,25 +46,24 @@ export default function SeriesDemoModal({ isOpen, onClose }: SeriesDemoModalProp
         };
     }, [isOpen]);
 
-    // Auto transition: after 5 seconds, shift video left and show content
+    // Auto transition: after 1.5 seconds, shift poster left and show content
     useEffect(() => {
         let timer: ReturnType<typeof setTimeout>;
         if (isOpen && !showContent) {
             timer = setTimeout(() => {
                 setShowContent(true);
-            }, 3000);
+            }, 1500);
         }
         return () => clearTimeout(timer);
     }, [isOpen, showContent]);
 
-    const toggleMute = () => {
-        if (videoRef.current) {
-            videoRef.current.muted = !videoRef.current.muted;
-            setIsMuted(videoRef.current.muted);
-        }
-    };
+    // Close handler — report currentTime back to parent
+    const handleClose = useCallback(() => {
+        const time = modalVideoRef.current?.currentTime;
+        onClose(time);
+    }, [onClose, modalVideoRef]);
 
-    return (
+    return createPortal(
         <AnimatePresence>
             {isOpen && (
                 <motion.div
@@ -61,7 +75,7 @@ export default function SeriesDemoModal({ isOpen, onClose }: SeriesDemoModalProp
                 >
                     {/* Close Button */}
                     <button
-                        onClick={onClose}
+                        onClick={handleClose}
                         className="absolute top-6 right-6 z-[110] p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors text-white"
                     >
                         <X size={24} />
@@ -77,39 +91,44 @@ export default function SeriesDemoModal({ isOpen, onClose }: SeriesDemoModalProp
                     <div className="relative z-[105] w-full max-w-6xl mx-auto px-6 flex items-center justify-center h-full">
                         <div className={`flex items-center gap-8 md:gap-16 lg:gap-24 transition-all duration-700 ease-in-out ${showContent ? 'flex-col md:flex-row' : 'justify-center'}`}>
 
-                            {/* Video Player - shifts left */}
+                            {/* Show Poster / Video - shifts left */}
                             <motion.div
                                 layout
-                                transition={{ duration: 0.7, ease: [0.4, 0, 0.2, 1] }}
+                                transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
                                 className="relative shrink-0"
                             >
                                 <motion.div
                                     layout
-                                    className={`relative aspect-[9/16] rounded-[24px] border-2 border-white/20 overflow-hidden shadow-2xl transition-all duration-700 ease-in-out ${showContent
+                                    className={`relative aspect-[9/16] rounded-[24px] border-2 border-white/20 overflow-hidden shadow-2xl transition-all duration-400 ease-in-out ${showContent
                                         ? 'w-[280px] md:w-[320px] lg:w-[350px]'
                                         : 'w-[320px] md:w-[400px] lg:w-[450px]'
                                         }`}
                                 >
-                                    <video
-                                        ref={videoRef}
-                                        autoPlay
-                                        className="w-full h-full object-cover"
-                                        controlsList="nodownload"
-                                        loop
-                                        playsInline
-                                        muted
-                                    >
-                                        <source src={assets.videoDemo} type="video/mp4" />
-                                        Your browser does not support the video tag.
-                                    </video>
+                                    {/* Video player (when videoUrl provided) */}
+                                    {videoUrl ? (
+                                        <video
+                                            ref={modalVideoRef}
+                                            className="w-full h-full object-cover"
+                                            playsInline
+                                        />
+                                    ) : (
+                                        <img
+                                            src={show?.image}
+                                            alt={show?.title || 'Show poster'}
+                                            className="w-full h-full object-cover"
+                                        />
+                                    )}
 
-                                    {/* Mute/Unmute Icon Overlay */}
-                                    <button
-                                        onClick={toggleMute}
-                                        className="absolute bottom-6 right-6 z-20 w-[40px] h-[40px] rounded-full bg-black/50 border border-white/20 backdrop-blur-md flex items-center justify-center cursor-pointer hover:bg-black/70 transition-colors"
-                                    >
-                                        {isMuted ? <VolumeX size={18} className="text-white" /> : <Volume2 size={18} className="text-white" />}
-                                    </button>
+                                    {/* Mute/Unmute overlay for video */}
+                                    {videoUrl && modalHasAudio && (
+                                        <button
+                                            onClick={toggleModalMute}
+                                            className="absolute bottom-4 right-4 z-20 w-10 h-10 rounded-full bg-black/50 border border-white/20 backdrop-blur-md flex items-center justify-center text-white hover:bg-black/70 transition-colors"
+                                            title={modalMuted ? 'Unmute' : 'Mute'}
+                                        >
+                                            {modalMuted ? <VolumeX size={16} /> : <Volume2 size={16} />}
+                                        </button>
+                                    )}
                                 </motion.div>
                             </motion.div>
 
@@ -120,7 +139,7 @@ export default function SeriesDemoModal({ isOpen, onClose }: SeriesDemoModalProp
                                         initial={{ opacity: 0, x: 80 }}
                                         animate={{ opacity: 1, x: 0 }}
                                         exit={{ opacity: 0, x: 80 }}
-                                        transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1], delay: 0.1 }}
+                                        transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1], delay: 0.05 }}
                                         className="flex flex-col items-center md:items-start max-w-lg text-white"
                                     >
                                         {/* QR Code Section */}
@@ -148,6 +167,7 @@ export default function SeriesDemoModal({ isOpen, onClose }: SeriesDemoModalProp
                     </div>
                 </motion.div>
             )}
-        </AnimatePresence>
+        </AnimatePresence>,
+        document.body
     );
 }

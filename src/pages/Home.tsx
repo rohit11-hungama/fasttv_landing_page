@@ -6,7 +6,7 @@ import { assets } from '../assets/figma_assets';
 import DownloadSection from '../components/DownloadSection';
 import FAQSection from '../components/FAQSection';
 import SeriesDemoModal from '../components/SeriesDemoModal';
-import ExclusiveRow from '../components/ExclusiveRow';
+
 import ScrollAnimation from '../components/ScrollAnimation';
 import SEO from '../components/SEO';
 
@@ -47,15 +47,7 @@ const Home = () => {
         { id: 10, title: "Donz", image: assets.imgPosterDonz },
     ];
 
-    const exclusiveShows: Show[] = [
-        { id: 1, title: "Naagin Ka Badla", image: assets.imgNaagin, logo: assets.imgNaaginLogo, logoClassName: "h-[66px]" },
-        { id: 2, title: "Badass Begum", image: assets.imgBadass, logo: assets.imgBadassLogo, logoClassName: "h-[66px]" },
-        { id: 3, title: "Yeh Hai Sanak", image: assets.imgSanak, logo: assets.imgSanakLogo, logoClassName: "h-[66px]" },
-        { id: 4, title: "Binni Ki Kitaab", image: assets.imgBinni, logo: assets.imgBinniLogo, logoClassName: "h-[66px]" },
-        { id: 5, title: "Hasratein 3", image: assets.imgHasratein3, logo: assets.imgHasrateinLogo, logoClassName: "h-[35px] max-w-[160px]" },
-        { id: 6, title: "Red Room", image: assets.imgRedRoom, logo: assets.imgRedRoomLogo, logoClassName: "h-[35px] max-w-[160px]" },
-        { id: 7, title: "Judwa Jaal", image: assets.imgJudwaJaal, logo: assets.imgJudwaJaalLogo },
-    ];
+
 
     return (
         <>
@@ -97,16 +89,7 @@ const Home = () => {
                 <ScrollAnimation delay={0.1}>
                     <DownloadSection />
                 </ScrollAnimation>
-                <ScrollAnimation delay={0.1}>
-                    <ExclusiveRow
-                        title="Experience It on FastTV"
-                        shows={exclusiveShows.map(show => ({
-                            ...show,
-                            videoUrl: assets.videoDemo // Adding video for exclusive section
-                        }))}
-                        onShowClick={handleShowClick}
-                    />
-                </ScrollAnimation>
+
                 <ScrollAnimation delay={0.1}>
                     <FAQSection />
                 </ScrollAnimation>

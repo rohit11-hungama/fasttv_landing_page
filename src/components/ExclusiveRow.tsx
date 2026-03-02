@@ -1,7 +1,7 @@
 
-import { useRef, useState } from 'react';
+import { useRef } from 'react';
 import { motion } from 'framer-motion';
-import { ChevronRight, ChevronLeft, Maximize2 } from 'lucide-react';
+import { ChevronRight, ChevronLeft } from 'lucide-react';
 import type { Show } from './ContentRow';
 
 interface ExclusiveRowProps {
@@ -11,29 +11,9 @@ interface ExclusiveRowProps {
 }
 
 const ExclusiveCard = ({ show, onClick }: { show: Show; onClick: () => void }) => {
-    const [isHovered, setIsHovered] = useState(false);
-    const videoRef = useRef<HTMLVideoElement>(null);
-
-    const handleMouseEnter = () => {
-        setIsHovered(true);
-        if (videoRef.current) {
-            videoRef.current.play().catch(() => { });
-        }
-    };
-
-    const handleMouseLeave = () => {
-        setIsHovered(false);
-        if (videoRef.current) {
-            videoRef.current.pause();
-            videoRef.current.currentTime = 0;
-        }
-    };
-
     return (
         <div
             onClick={onClick}
-            onMouseEnter={handleMouseEnter}
-            onMouseLeave={handleMouseLeave}
             className="relative cursor-pointer group/card"
         >
             {/* Main Container - 9:16 Ratio approx */}
@@ -42,43 +22,17 @@ const ExclusiveCard = ({ show, onClick }: { show: Show; onClick: () => void }) =
                 whileHover={{ scale: 1.05, zIndex: 10 }}
                 transition={{ duration: 0.3 }}
             >
-                {/* Video Layer (Base) */}
-                {show.videoUrl && (
-                    <video
-                        ref={videoRef}
-                        src={show.videoUrl}
-                        className="absolute inset-0 w-full h-full object-cover"
-                        loop
-                        muted
-                        playsInline
-                    />
-                )}
-
-                {/* Image Layer (Overlay) - Fades out on hover */}
-                <motion.div
-                    className="absolute inset-0 z-10"
-                    animate={{ opacity: isHovered ? 0 : 1 }}
-                    transition={{ duration: 0.5 }}
-                >
+                {/* Image Layer */}
+                <div className="absolute inset-0">
                     <img
                         src={show.image}
                         alt={show.title}
                         className="w-full h-full object-cover"
                         loading="lazy"
                     />
-                </motion.div>
+                </div>
 
-                {/* Expand Icon - Visible on hover */}
-                <motion.div
-                    className="absolute bottom-4 right-4 z-20 w-[36px] h-[36px] rounded-full bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center pointer-events-none"
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: isHovered ? 1 : 0, scale: isHovered ? 1 : 0.8 }}
-                    transition={{ duration: 0.2 }}
-                >
-                    <Maximize2 size={18} className="text-white" />
-                </motion.div>
-
-                {/* Title Gradient - Always visible but adjusts */}
+                {/* Title Gradient - Always visible */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent pointer-events-none" />
 
                 {/* Logo or Title */}
