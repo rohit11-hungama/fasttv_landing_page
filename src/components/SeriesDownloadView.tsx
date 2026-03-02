@@ -55,9 +55,9 @@ export default function SeriesDownloadView({ }: SeriesDownloadViewProps) {
                 {/* Right Side: Content & Download */}
                 <div className="flex flex-col items-center md:items-start max-w-lg text-white">
                     {/* QR Code Section */}
-                    <div className="mb-8 flex flex-col items-center md:items-start">
+                    <div className="mb-8 flex flex-col items-center md:items-start text-center md:text-left">
                         {/* Using imgQrCodeForMobileEnglishWikipedia1 if available, otherwise a placeholder or generic QR */}
-                        <div className="bg-white p-2 rounded-xl mb-4 w-[132px] h-[132px] md:w-[165px] md:h-[165px]">
+                        <div className="bg-white p-3 rounded-[20px] mb-4 w-[132px] h-[132px] md:w-[165px] md:h-[165px] shadow-lg">
                             {/* Fallback QR or mapped asset */}
                             <img src={assets.imgQrCodeForMobileEnglishWikipedia1} alt="QR Code" className="w-full h-full object-contain" />
                         </div>

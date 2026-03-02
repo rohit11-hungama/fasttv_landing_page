@@ -77,8 +77,8 @@ export default function DownloadSection() {
 
                     {/* QR Code */}
                     <div className="hidden lg:flex flex-col gap-4 items-center z-10 mr-12">
-                        <div className="w-[180px] h-[180px] bg-white/10 rounded-xl p-2 backdrop-blur-sm">
-                            <img src={assets.imgQrCodeForMobileEnglishWikipedia1} className="w-full h-full object-contain invert" alt="QR Code" />
+                        <div className="w-[180px] h-[180px] bg-white rounded-[20px] p-4 shadow-xl">
+                            <img src={assets.imgQrCodeForMobileEnglishWikipedia1} className="w-full h-full object-contain" alt="QR Code" />
                         </div>
                         <p className="text-[16px] text-white text-center">
                             Scan to download FastTV

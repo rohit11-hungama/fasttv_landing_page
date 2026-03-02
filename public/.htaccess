@@ -1,0 +1,99 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# FastTV – Hostinger Production .htaccess
+# ─────────────────────────────────────────────────────────────────────────────
+
+# ── Force HTTPS ──────────────────────────────────────────────────────────────
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteCond %{HTTPS} off
+    RewriteRule ^(.*)$ https://%{HTTP_HOST}/$1 [R=301,L]
+</IfModule>
+
+# ── SPA Fallback (React Router) ───────────────────────────────────────────────
+# Serve index.html for any request that is not a real file/directory,
+# so that client-side routes (/privacy, /terms, /about …) work on refresh.
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /
+
+    # Pass through real files and directories
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+
+    # Pass through /.well-known/* as-is (needed for Apple / Google verification)
+    RewriteCond %{REQUEST_URI} !^/\.well-known/
+
+    RewriteRule ^ index.html [QSA,L]
+</IfModule>
+
+# ── MIME Types ────────────────────────────────────────────────────────────────
+<IfModule mod_mime.c>
+    # JavaScript modules
+    AddType application/javascript          .js .mjs
+    # Web App Manifest
+    AddType application/manifest+json       .webmanifest .json
+    # Fonts
+    AddType font/woff                       .woff
+    AddType font/woff2                      .woff2
+    # Video
+    AddType video/mp4                       .mp4
+    AddType application/x-mpegurl          .m3u8
+    AddType video/mp2t                      .ts
+
+    # ── .well-known files must be served as JSON ──────────────────────────────
+    <Files "apple-app-site-association">
+        Header set Content-Type "application/json"
+    </Files>
+    <Files "assetlinks.json">
+        Header set Content-Type "application/json"
+    </Files>
+</IfModule>
+
+# ── Compression (Gzip) ────────────────────────────────────────────────────────
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/css text/javascript
+    AddOutputFilterByType DEFLATE application/javascript application/json
+    AddOutputFilterByType DEFLATE font/woff font/woff2 image/svg+xml
+</IfModule>
+
+# ── Browser Caching ───────────────────────────────────────────────────────────
+<IfModule mod_expires.c>
+    ExpiresActive On
+
+    # Vite hashed assets – cache for 1 year (immutable)
+    <FilesMatch "\.(js|css|woff|woff2|png|jpg|jpeg|gif|webp|svg|ico|mp4)$">
+        ExpiresDefault "access plus 1 year"
+        Header set Cache-Control "public, max-age=31536000, immutable"
+    </FilesMatch>
+
+    # HTML – never cache so new version always loads
+    <FilesMatch "\.html$">
+        ExpiresDefault "access plus 0 seconds"
+        Header set Cache-Control "no-cache, no-store, must-revalidate"
+        Header set Pragma "no-cache"
+    </FilesMatch>
+
+    # .well-known – short cache so changes propagate quickly
+    <FilesMatch "(apple-app-site-association|assetlinks\.json)$">
+        ExpiresDefault "access plus 1 hour"
+        Header set Cache-Control "public, max-age=3600"
+    </FilesMatch>
+</IfModule>
+
+# ── Security Headers ─────────────────────────────────────────────────────────
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set Referrer-Policy "strict-origin-when-cross-origin"
+    Header set Permissions-Policy "camera=(), microphone=(), geolocation=()"
+</IfModule>
+
+# ── Disable Directory Listing ────────────────────────────────────────────────
+Options -Indexes
+
+# ── Block access to hidden files (except .well-known) ────────────────────────
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteCond %{REQUEST_URI} !^/\.well-known/
+    RewriteRule (^|/)\.(?!well-known) - [F,L]
+</IfModule>

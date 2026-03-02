@@ -61,7 +61,7 @@ import imgAndroid511_src from './figma/6c4bbdbac6546c462d9053badf3751cfa05a3fbe.
 import imgGroup1171280241_src from './figma/2fdc429ff22708fc20ac953fc7a02582d75edd1c.svg';
 import img1_src from './figma/b108f57d8dcddd72ea1f4ebd10e35458b44234a6.svg';
 import img2_src from './figma/3a04cef75dab40679f8f0c1200f69c0c05b52604.svg';
-import imgQrCodeForMobileEnglishWikipedia1_src from './figma/58343e9c788c7f4d6f2426c408c4debfa174e402.svg';
+import imgQrCodeForMobileEnglishWikipedia1_src from './figma/fasttv_qr_code.png';
 import imgFrame4055_src from './figma/695974f82179f280be43dc6eeab2976f655ef888.svg';
 import imgGroup5_src from './figma/88f4c05d00af535777404d80258eac07663867b0.svg';
 import imgFrame4056_src from './figma/ee42eacadd1972ceb2be643a878d4a2dfda0f7b5.svg';
@@ -120,8 +120,6 @@ import wnMakeMeUp_src from './figma/wn_make_me_up.png';
 import wnMastiExpress_src from './figma/wn_masti_express.png';
 import wnKaamraj_src from './figma/wn_kaamraj.png';
 import videoDemo_src from './figma/fasttv_demo.mp4';
-import videoHero_src from './figma/fasttv_hero.mp4';
-import videoHeroMobile_src from './figma/fasttv_hero_mobile.mp4';
 import mobileFrame_src from './figma/mobile_frame.png';
 import imgNavigationLogo_src from './figma/navigation_fastTV_logo.svg';
 
@@ -161,7 +159,6 @@ import imgJudwaJaalLogo_src from './figma/judwajaal.png';
 
 export const assets = {
   mobileFrame: mobileFrame_src,
-  videoHero: videoHero_src,
   imgNavigationLogo: imgNavigationLogo_src,
   imgRectangle9211: imgRectangle9211_src,
   imgRectangle9212: imgRectangle9212_src,
@@ -283,7 +280,6 @@ export const assets = {
   wnKaamraj: wnKaamraj_src,
   // Videos
   videoDemo: videoDemo_src,
-  videoHeroMobile: videoHeroMobile_src,
   // New Experience It on FastTV assets
   imgNaagin: imgNaagin_src,
   imgBadass: imgBadass_src,

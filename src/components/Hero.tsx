@@ -7,7 +7,6 @@ import StoreButtons from './StoreButtons';
 import SeriesDemoModal from './SeriesDemoModal';
 import { useHeroData } from '../hooks/useHeroData';
 import { useHlsVideo } from '../hooks/useHlsVideo';
-import type { Show } from './ContentRow';
 
 const ARTWORK_DISPLAY_MS = 1200;
 
@@ -40,9 +39,12 @@ export default function Hero() {
         toggleMute,
         pause,
         play,
-        getCurrentTime,
         seekTo,
-    } = useHlsVideo({ src: videoUrl, onEnded: handleVideoEnded });
+    } = useHlsVideo({
+        // Only load mobile video source if on mobile AND modal not open
+        src: (typeof window !== 'undefined' && window.innerWidth < 1024 && !isModalOpen) ? videoUrl : null,
+        onEnded: handleVideoEnded
+    });
 
     // Reset artwork on index change
     useEffect(() => { setShowArtwork(true); }, [mobileIndex]);
@@ -58,16 +60,12 @@ export default function Hero() {
         togglePlay();
     }, [togglePlay]);
 
-    // Track start time for modal video
-    const [modalStartTime, setModalStartTime] = useState(0);
 
-    // Expand: pause phone video, capture time, open modal
+    // Expand: pause phone video, open modal
     const handleExpand = useCallback(() => {
         pause();
-        const t = getCurrentTime();
-        setModalStartTime(t);
         setIsModalOpen(true);
-    }, [pause, getCurrentTime]);
+    }, [pause]);
 
     // Collapse: resume phone video from modal's position
     const handleCloseModal = useCallback((currentTime?: number) => {
@@ -78,12 +76,6 @@ export default function Hero() {
         play();
     }, [seekTo, play]);
 
-    // Bridge CarouselItem → Show for modal
-    const modalShow: Show | null = mobileItem ? {
-        id: mobileIndex,
-        title: mobileItem.title,
-        image: mobileItem.filePath,
-    } : null;
 
     return (
         <>
@@ -208,7 +200,7 @@ export default function Hero() {
 
                             {/* Control Buttons — stacked vertically */}
                             {videoUrl && !isLoading && (
-                                <div className="absolute bottom-[120px] right-[12px] z-40 flex flex-col gap-2">
+                                <div className="absolute bottom-6 right-4 z-40 flex flex-col gap-2">
                                     {/* Mute/Unmute — only for trailer videos with audio */}
                                     {hasAudio && (
                                         <button
@@ -290,9 +282,8 @@ export default function Hero() {
             <SeriesDemoModal
                 isOpen={isModalOpen}
                 onClose={handleCloseModal}
-                show={modalShow}
-                videoUrl={videoUrl}
-                startTime={modalStartTime}
+                items={carouselItems}
+                initialIndex={mobileIndex}
             />
         </>
     );

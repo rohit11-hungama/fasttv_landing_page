@@ -7,26 +7,30 @@ interface UseHlsVideoOptions {
     onEnded?: () => void;
     /** Seek to this time (seconds) once the video is ready */
     startTime?: number;
+    /** Whether the video should start muted (default: true) */
+    initialMuted?: boolean;
 }
 
 /**
  * Hook to handle both MP4 and HLS (.m3u8) video playback.
  * Exposes videoReady for crossfade timing and hasAudio for conditional UI.
  */
-export function useHlsVideo({ src, autoPlay = true, onEnded, startTime }: UseHlsVideoOptions) {
+export function useHlsVideo({ src, autoPlay = true, onEnded, startTime, initialMuted = true }: UseHlsVideoOptions) {
     const videoRef = useRef<HTMLVideoElement>(null);
     const hlsRef = useRef<Hls | null>(null);
     const [isPlaying, setIsPlaying] = useState(autoPlay);
-    const [isMuted, setIsMuted] = useState(true);
+    const [isMuted, setIsMuted] = useState(initialMuted);
     const [videoReady, setVideoReady] = useState(false);
     const [showPlayBtn, setShowPlayBtn] = useState(true);
     const hideTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
     const onEndedRef = useRef(onEnded);
     const startTimeRef = useRef(startTime);
+    const initialMutedRef = useRef(initialMuted);
 
     // Keep refs current without re-triggering effects
     useEffect(() => { onEndedRef.current = onEnded; }, [onEnded]);
     useEffect(() => { startTimeRef.current = startTime; }, [startTime]);
+    useEffect(() => { initialMutedRef.current = initialMuted; }, [initialMuted]);
 
     const isHls = src?.includes('.m3u8') ?? false;
     // Trailers (HLS) have audio; preview MP4s are silent
@@ -55,19 +59,36 @@ export function useHlsVideo({ src, autoPlay = true, onEnded, startTime }: UseHls
             setVideoReady(true);
         };
         const handleEnded = () => { onEndedRef.current?.(); };
+        const handlePlayEvent = () => setIsPlaying(true);
+        const handlePauseEvent = () => setIsPlaying(false);
 
         video.addEventListener('canplay', handleCanPlay);
         video.addEventListener('ended', handleEnded);
+        video.addEventListener('play', handlePlayEvent);
+        video.addEventListener('pause', handlePauseEvent);
 
         const startPlayback = () => {
-            video.muted = true; // always start muted for autoplay
+            video.muted = initialMutedRef.current;
             if (autoPlay) {
-                video.play().catch(() => { });
+                video.play().catch(() => {
+                    // Fallback if browser blocks unmuted autoplay
+                    video.muted = true;
+                    setIsMuted(true);
+                    video.play().catch(() => { });
+                });
             }
         };
 
         if (isHls && Hls.isSupported()) {
-            const hls = new Hls({ enableWorker: true, lowLatencyMode: false });
+            const hls = new Hls({
+                enableWorker: true,
+                lowLatencyMode: false,
+                backBufferLength: 10,
+                maxBufferLength: 10,
+                maxMaxBufferLength: 20,
+                capLevelToPlayerSize: true,
+                startLevel: -1, // Auto
+            });
             hls.loadSource(src);
             hls.attachMedia(video);
             hlsRef.current = hls;
@@ -83,6 +104,8 @@ export function useHlsVideo({ src, autoPlay = true, onEnded, startTime }: UseHls
         return () => {
             video.removeEventListener('canplay', handleCanPlay);
             video.removeEventListener('ended', handleEnded);
+            video.removeEventListener('play', handlePlayEvent);
+            video.removeEventListener('pause', handlePauseEvent);
             if (hlsRef.current) {
                 hlsRef.current.destroy();
                 hlsRef.current = null;

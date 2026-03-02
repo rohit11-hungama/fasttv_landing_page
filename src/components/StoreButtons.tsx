@@ -20,7 +20,7 @@ export default function StoreButtons({ className, buttonClassName }: StoreButton
             <AnimatePresence mode="popLayout">
                 {renderAppStore && (
                     <motion.a
-                        href="https://fasttv.onelink.me/jiWp/share"
+                        href="https://apps.apple.com/us/app/fasttv-short-vertical-shows/id6757302022"
                         target="_blank"
                         rel="noopener noreferrer"
                         className={cn("hover:opacity-90 transition-opacity block", buttonClassName)}
@@ -35,7 +35,7 @@ export default function StoreButtons({ className, buttonClassName }: StoreButton
                 )}
                 {renderPlayStore && (
                     <motion.a
-                        href="https://fasttv.onelink.me/jiWp/share"
+                        href="https://play.google.com/store/apps/details?id=com.app.hmini&hl=en_IN"
                         target="_blank"
                         rel="noopener noreferrer"
                         className={cn("hover:opacity-90 transition-opacity block", buttonClassName)}

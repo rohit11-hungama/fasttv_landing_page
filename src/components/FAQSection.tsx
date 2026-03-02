@@ -28,7 +28,7 @@ export default function FAQSection() {
     const [openIndex, setOpenIndex] = useState<number | null>(0);
 
     return (
-        <section className="relative w-full py-20 bg-[#040406]">
+        <section id="faqs" className="relative w-full py-20 bg-[#040406] scroll-mt-24">
             {/* Background elements from Figma */}
             <div className="absolute inset-0 pointer-events-none">
                 {/* Right/Center Image */}

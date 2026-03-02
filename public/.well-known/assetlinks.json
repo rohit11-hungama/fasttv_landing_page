@@ -1,0 +1,16 @@
+[
+    {
+        "relation": [
+            "delegate_permission/common.handle_all_urls"
+        ],
+        "target": {
+            "namespace": "android_app",
+            "package_name": "com.app.hmini",
+            "sha256_cert_fingerprints": [
+                "0D:73:F9:E7:92:C4:DD:10:E0:DC:42:74:2C:41:5A:97:9D:B6:80:DE:2A:2C:D7:E5:8F:A8:4D:21:96:B1:69:AA",
+                "5E:51:2F:82:83:1C:7A:41:5C:89:52:FE:A3:0A:5A:FB:05:0A:17:67:12:EB:BD:7F:13:4E:58:E1:FE:A5:C5:20",
+                "FA:C6:17:45:DC:09:03:78:6F:B9:ED:E6:2A:96:2B:39:9F:73:48:F0:BB:6F:89:9B:83:32:66:75:91:03:3B:9C"
+            ]
+        }
+    }
+]

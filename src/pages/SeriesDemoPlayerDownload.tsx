@@ -58,9 +58,9 @@ export default function SeriesDemoPlayerDownload() {
                 {/* Right Side: Content & Download */}
                 <div className="flex flex-col items-start max-w-lg text-white">
                     {/* QR Code Section */}
-                    <div className="mb-10 flex flex-col items-center md:items-start hidden md:flex">
+                    <div className="mb-10 flex flex-col items-center md:items-start hidden md:flex text-center md:text-left">
                         {/* Using imgQrCodeForMobileEnglishWikipedia1 if available, otherwise a placeholder or generic QR */}
-                        <div className="bg-white p-2 rounded-xl mb-4 w-[165px] h-[165px]">
+                        <div className="bg-white p-4 rounded-[24px] mb-4 w-[165px] h-[165px] shadow-lg">
                             {/* Fallback QR or mapped asset */}
                             <img src={assets.imgQrCodeForMobileEnglishWikipedia1} alt="QR Code" className="w-full h-full object-contain" />
                         </div>

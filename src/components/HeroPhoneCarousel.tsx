@@ -4,7 +4,6 @@ import { Volume2, VolumeX, Play, Pause, Maximize2 } from 'lucide-react';
 import { useHlsVideo } from '../hooks/useHlsVideo';
 import SeriesDemoModal from './SeriesDemoModal';
 import type { CarouselItem } from '../hooks/useHeroData';
-import type { Show } from './ContentRow';
 
 interface HeroPhoneCarouselProps {
     carouselItems: CarouselItem[];
@@ -40,9 +39,11 @@ export default function HeroPhoneCarousel({ carouselItems, isLoading }: HeroPhon
         toggleMute,
         pause,
         play,
-        getCurrentTime,
         seekTo,
-    } = useHlsVideo({ src: activeVideoUrl, onEnded: handleVideoEnded });
+    } = useHlsVideo({
+        src: isModalOpen ? null : activeVideoUrl,
+        onEnded: handleVideoEnded
+    });
 
     // When activeIndex changes, show artwork first
     useEffect(() => { setShowArtwork(true); }, [activeIndex]);
@@ -63,16 +64,12 @@ export default function HeroPhoneCarousel({ carouselItems, isLoading }: HeroPhon
         togglePlay();
     }, [togglePlay]);
 
-    // Track start time for modal video
-    const [modalStartTime, setModalStartTime] = useState(0);
 
-    // Expand: pause phone video, capture time, open modal
+    // Expand: pause phone video, open modal
     const handleExpand = useCallback(() => {
         pause();
-        const t = getCurrentTime();
-        setModalStartTime(t);
         setIsModalOpen(true);
-    }, [pause, getCurrentTime]);
+    }, [pause]);
 
     // Collapse: resume phone video from modal's position
     const handleCloseModal = useCallback((currentTime?: number) => {
@@ -83,12 +80,6 @@ export default function HeroPhoneCarousel({ carouselItems, isLoading }: HeroPhon
         play();
     }, [seekTo, play]);
 
-    // Bridge CarouselItem → Show for modal
-    const modalShow: Show | null = activeItem ? {
-        id: activeIndex,
-        title: activeItem.title,
-        image: activeItem.filePath,
-    } : null;
 
     // Sliding window
     const visibleWindow = useMemo(() => {
@@ -212,9 +203,8 @@ export default function HeroPhoneCarousel({ carouselItems, isLoading }: HeroPhon
             <SeriesDemoModal
                 isOpen={isModalOpen}
                 onClose={handleCloseModal}
-                show={modalShow}
-                videoUrl={activeVideoUrl}
-                startTime={modalStartTime}
+                items={carouselItems}
+                initialIndex={activeIndex}
             />
         </>
     );

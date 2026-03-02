@@ -1,0 +1,19 @@
+{
+  "webcredentials": {
+    "apps": [
+      "3YVQQ2K649.com.app.hmini"
+    ]
+  },
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appID": "3YVQQ2K649.com.app.hmini",
+        "paths": [
+          "/",
+          "/*"
+        ]
+      }
+    ]
+  }
+}

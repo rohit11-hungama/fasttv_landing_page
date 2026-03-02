@@ -10,10 +10,12 @@ import SeriesDemoPlayerDownload from './pages/SeriesDemoPlayerDownload';
 import TermsOfUse from './pages/TermsOfUse';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import ContactUs from './pages/ContactUs';
+import ScrollToTop from './components/ScrollToTop';
 
 function App() {
   return (
     <div className="min-h-screen bg-[#040406] text-white font-product-sans overflow-x-hidden selection:bg-[#009cdb] selection:text-white pb-20">
+      <ScrollToTop />
       <Navbar />
       <Routes>
         <Route path="/" element={<Home />} />
@@ -22,8 +24,8 @@ function App() {
         <Route path="/whats-new" element={<WhatsNew />} />
         <Route path="/player" element={<SeriesDemoPlayer />} />
         <Route path="/player-download" element={<SeriesDemoPlayerDownload />} />
-        <Route path="/terms-conditions" element={<TermsOfUse />} />
-        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+        <Route path="/terms" element={<TermsOfUse />} />
+        <Route path="/privacy" element={<PrivacyPolicy />} />
         <Route path="/contact-us" element={<ContactUs />} />
       </Routes>
       <Footer />
