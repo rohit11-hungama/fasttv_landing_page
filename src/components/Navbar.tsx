@@ -70,75 +70,78 @@ export default function Navbar() {
 
     // ─── Full navigation for all other routes ──────────────────────────────────
     return (
-        <nav
-            className={cn(
-                'fixed top-0 left-0 right-0 z-50 transition-all duration-300 h-[90px] flex items-center',
-                isScrolled ? 'bg-black/70 backdrop-blur-[25px]' : 'bg-transparent'
-            )}
-        >
-            <div className="container mx-auto px-6 flex items-center justify-between">
-                {/* Logo Section (Desktop) */}
-                <div className="hidden lg:flex items-center gap-12">
-                    <Link to="/" className="relative w-[129px] h-[35px] flex items-center">
-                        <div className="relative w-full h-full flex items-center justify-center">
-                            <img src={assets.imgNavigationLogo} className="h-full w-auto object-contain" alt="FastTV Logo" />
-                        </div>
-                    </Link>
-
-                    {/* Desktop Links */}
-                    <div className="flex items-center gap-8 ml-8">
-                        {navLinks.map((link) => (
-                            <div key={link.name} className="relative h-[90px] flex items-center justify-center">
-                                <Link
-                                    to={link.path}
-                                    className={cn(
-                                        "text-[15px] font-bold text-center transition-colors px-2",
-                                        isActive(link.path) ? "text-[#009cdb]" : "text-white hover:text-[#009cdb]"
-                                    )}
-                                    onClick={() => { if (isActive(link.path)) window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-                                >
-                                    {link.name}
-                                </Link>
-                                {isActive(link.path) && (
-                                    <div className="absolute bottom-0 left-0 right-0 h-[3px] bg-[#009cdb]" />
-                                )}
+        <>
+            <nav
+                className={cn(
+                    'fixed top-0 left-0 right-0 z-[50] transition-all duration-300 h-[90px] flex items-center',
+                    isScrolled ? 'bg-black/70 backdrop-blur-[25px]' : 'bg-transparent'
+                )}
+            >
+                <div className="container mx-auto px-6 flex items-center justify-between">
+                    {/* Logo Section (Desktop) */}
+                    <div className="hidden lg:flex items-center gap-12">
+                        <Link to="/" className="relative w-[129px] h-[35px] flex items-center">
+                            <div className="relative w-full h-full flex items-center justify-center">
+                                <img src={assets.imgNavigationLogo} className="h-full w-auto object-contain" alt="FastTV Logo" />
                             </div>
-                        ))}
-                    </div>
-                </div>
+                        </Link>
 
-                {/* Mobile Header */}
-                <div className="lg:hidden flex items-center justify-between w-full">
-                    <Link to="/" className="flex items-center">
-                        <img src={assets.imgNavigationLogo} className="h-[28px] w-auto object-contain" alt="FastTV" />
-                    </Link>
-                    <div className="flex items-center">
-                        <button
-                            className="text-white"
-                            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                        >
-                            {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-                        </button>
-                    </div>
-                </div>
-
-                {/* Desktop Right Actions */}
-                <div className="hidden lg:flex items-center gap-6">
-                    <a
-                        href="https://fasttv.onelink.me/jiWp/share"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="bg-[rgba(255,255,255,0.1)] border border-[rgba(255,255,255,0.1)] rounded-[12px] px-4 py-3 flex items-center gap-2 cursor-pointer hover:bg-[rgba(255,255,255,0.2)] transition-colors"
-                    >
-                        <div className="w-4 h-4 relative">
-                            <img src={assets.imgGroup4} alt="" className="w-full h-full" />
+                        {/* Desktop Links */}
+                        <div className="flex items-center gap-8 ml-8">
+                            {navLinks.map((link) => (
+                                <div key={link.name} className="relative h-[90px] flex items-center justify-center">
+                                    <Link
+                                        to={link.path}
+                                        className={cn(
+                                            "text-[15px] font-bold text-center transition-colors px-2",
+                                            isActive(link.path) ? "text-[#009cdb]" : "text-white hover:text-[#009cdb]"
+                                        )}
+                                        onClick={() => { if (isActive(link.path)) window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                                    >
+                                        {link.name}
+                                    </Link>
+                                    {isActive(link.path) && (
+                                        <div className="absolute bottom-0 left-0 right-0 h-[3px] bg-[#009cdb]" />
+                                    )}
+                                </div>
+                            ))}
                         </div>
-                        <span className="text-[13px] font-bold text-white">Download App</span>
-                    </a>
-                </div>
-            </div>
+                    </div>
 
-            {/* Mobile Menu – Slide from Right */}
+                    {/* Mobile Header */}
+                    <div className="lg:hidden flex items-center justify-between w-full">
+                        <Link to="/" className="flex items-center">
+                            <img src={assets.imgNavigationLogo} className="h-[28px] w-auto object-contain" alt="FastTV" />
+                        </Link>
+                        <div className="flex items-center">
+                            <button
+                                className="text-white"
+                                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                            >
+                                {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Desktop Right Actions */}
+                    <div className="hidden lg:flex items-center gap-6">
+                        <a
+                            href="https://fasttv.onelink.me/jiWp/share"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="bg-[rgba(255,255,255,0.1)] border border-[rgba(255,255,255,0.1)] rounded-[12px] px-4 py-3 flex items-center gap-2 cursor-pointer hover:bg-[rgba(255,255,255,0.2)] transition-colors"
+                        >
+                            <div className="w-4 h-4 relative">
+                                <img src={assets.imgGroup4} alt="" className="w-full h-full" />
+                            </div>
+                            <span className="text-[13px] font-bold text-white">Download App</span>
+                        </a>
+                    </div>
+                </div>
+
+            </nav>
+
+            {/* Mobile Menu – outside <nav> to avoid backdrop-filter containing-block bug */}
             <AnimatePresence>
                 {mobileMenuOpen && (
                     <>
@@ -146,7 +149,7 @@ export default function Navbar() {
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
-                            className="lg:hidden fixed inset-0 bg-black/60 z-40"
+                            className="lg:hidden fixed inset-0 bg-black/60 z-[60]"
                             onClick={() => setMobileMenuOpen(false)}
                         />
                         <motion.div
@@ -154,7 +157,7 @@ export default function Navbar() {
                             animate={{ x: 0 }}
                             exit={{ x: '100%' }}
                             transition={{ type: 'tween', duration: 0.3, ease: 'easeInOut' }}
-                            className="lg:hidden fixed top-0 right-0 h-full w-[75%] max-w-[300px] bg-black/95 backdrop-blur-xl border-l border-white/10 z-50 overflow-y-auto"
+                            className="lg:hidden fixed top-0 right-0 h-full w-[75%] max-w-[300px] bg-black/95 backdrop-blur-xl border-l border-white/10 z-[70] overflow-y-auto"
                         >
                             <div className="flex justify-end p-6">
                                 <button className="text-white" onClick={() => setMobileMenuOpen(false)}>
@@ -189,6 +192,6 @@ export default function Navbar() {
                     </>
                 )}
             </AnimatePresence>
-        </nav>
+        </>
     );
 }
