@@ -20,7 +20,7 @@ export default function StoreButtons({ className, buttonClassName }: StoreButton
             <AnimatePresence mode="popLayout">
                 {renderAppStore && (
                     <motion.a
-                        href="https://apps.apple.com/us/app/fasttv-short-vertical-shows/id6757302022"
+                        href="https://apps.apple.com/in/app/fasttv-short-vertical-shows/id6757302022"
                         target="_blank"
                         rel="noopener noreferrer"
                         className={cn("hover:opacity-90 transition-opacity block", buttonClassName)}
