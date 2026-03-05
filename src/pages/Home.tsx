@@ -5,22 +5,30 @@ import RankingRow from '../components/RankingRow';
 import { assets } from '../assets/figma_assets';
 import DownloadSection from '../components/DownloadSection';
 import FAQSection from '../components/FAQSection';
-import SeriesDemoModal from '../components/SeriesDemoModal';
-
+import SeriesDemoModal, { type FullViewItem } from '../components/SeriesDemoModal';
+import { useHeroData } from '../hooks/useHeroData';
 import ScrollAnimation from '../components/ScrollAnimation';
 import SEO from '../components/SEO';
 
 const Home = () => {
-    const [selectedShow, setSelectedShow] = useState<Show | null>(null);
-    const [isModalOpen, setIsModalOpen] = useState(false);
+    const { carouselItems, isLoading } = useHeroData();
+
+    // Rail-click modal state
+    const [railPlaylist, setRailPlaylist] = useState<FullViewItem[] | null>(null);
+    const [isRailModalOpen, setIsRailModalOpen] = useState(false);
 
     const handleShowClick = (show: Show) => {
-        setSelectedShow(show);
-        setIsModalOpen(true);
+        // Build playlist: static rail item first, then all hero carousel items
+        const playlist: FullViewItem[] = [
+            { kind: 'rail', title: show.title, image: show.image },
+            ...carouselItems.map(c => ({ kind: 'carousel' as const, item: c })),
+        ];
+        setRailPlaylist(playlist);
+        setIsRailModalOpen(true);
     };
 
-    const handleCloseModal = () => {
-        setIsModalOpen(false);
+    const handleCloseRailModal = () => {
+        setIsRailModalOpen(false);
     };
 
     const recentShows: Show[] = [
@@ -47,8 +55,6 @@ const Home = () => {
         { id: 10, title: "Donz", image: assets.imgPosterDonz },
     ];
 
-
-
     return (
         <>
             <SEO
@@ -65,7 +71,7 @@ const Home = () => {
                 }}
             />
             <ScrollAnimation>
-                <Hero />
+                <Hero carouselItems={carouselItems} isLoading={isLoading} />
             </ScrollAnimation>
             <main className="pb-8 md:pb-12 space-y-8 md:space-y-12">
                 <ScrollAnimation delay={0.2} className="relative z-20 pl-0 mt-10">
@@ -95,10 +101,11 @@ const Home = () => {
                 </ScrollAnimation>
             </main>
 
+            {/* Rail-click full view modal */}
             <SeriesDemoModal
-                isOpen={isModalOpen}
-                onClose={handleCloseModal}
-                show={selectedShow}
+                isOpen={isRailModalOpen}
+                onClose={handleCloseRailModal}
+                playlist={railPlaylist ?? undefined}
             />
         </>
     );

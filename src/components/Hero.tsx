@@ -5,13 +5,17 @@ import { assets } from '../assets/figma_assets';
 import HeroPhoneCarousel from './HeroPhoneCarousel';
 import StoreButtons from './StoreButtons';
 import SeriesDemoModal from './SeriesDemoModal';
-import { useHeroData } from '../hooks/useHeroData';
 import { useHlsVideo } from '../hooks/useHlsVideo';
+import type { CarouselItem } from '../hooks/useHeroData';
 
 const ARTWORK_DISPLAY_MS = 1200;
 
-export default function Hero() {
-    const { carouselItems, isLoading } = useHeroData();
+interface HeroProps {
+    carouselItems: CarouselItem[];
+    isLoading: boolean;
+}
+
+export default function Hero({ carouselItems, isLoading }: HeroProps) {
     const totalItems = carouselItems.length;
 
     // Mobile carousel state
