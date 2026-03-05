@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { assets } from '../assets/figma_assets';
 import type { Show } from './ContentRow';
-import { X, VolumeX, Volume2 } from 'lucide-react';
+import { X, VolumeX, Volume2, Play, Pause } from 'lucide-react';
 import StoreButtons from './StoreButtons';
 import { useHlsVideo } from '../hooks/useHlsVideo';
 import { useDeviceDetect } from '../hooks/useDeviceDetect';
@@ -25,6 +25,12 @@ function getItemTitle(item: FullViewItem): string {
 function getItemVideoUrl(item: FullViewItem): string | null {
     if (item.kind === 'rail') return null;
     return item.item.trailer_url || item.item.preview_url || null;
+}
+function formatTime(secs: number): string {
+    if (!isFinite(secs) || secs < 0) return '0:00';
+    const m = Math.floor(secs / 60);
+    const s = Math.floor(secs % 60);
+    return `${m}:${s.toString().padStart(2, '0')}`;
 }
 
 // ─── Props ─────────────────────────────────────────────────────────────────
@@ -157,6 +163,42 @@ export default function SeriesDemoModal({
         onClose(time);
     }, [onClose, modalVideoRef]);
 
+    // ── Video time tracking (seekbar) ────────────────────────────────────────
+    const [currentTime, setCurrentTime] = useState(0);
+    const [duration, setDuration] = useState(0);
+
+    useEffect(() => {
+        const video = modalVideoRef.current;
+        if (!video) return;
+        const onTimeUpdate = () => setCurrentTime(video.currentTime);
+        const onDuration = () => setDuration(isFinite(video.duration) ? video.duration : 0);
+        video.addEventListener('timeupdate', onTimeUpdate);
+        video.addEventListener('durationchange', onDuration);
+        video.addEventListener('loadedmetadata', onDuration);
+        return () => {
+            video.removeEventListener('timeupdate', onTimeUpdate);
+            video.removeEventListener('durationchange', onDuration);
+            video.removeEventListener('loadedmetadata', onDuration);
+        };
+    }); // intentionally no deps — re-attach whenever ref content changes
+
+    // Reset time display when active item changes
+    useEffect(() => {
+        setCurrentTime(0);
+        setDuration(0);
+    }, [activePlaylistIndex]);
+
+    const handleSeek = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+        const video = modalVideoRef.current;
+        if (!video || !duration) return;
+        const rect = e.currentTarget.getBoundingClientRect();
+        const pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+        video.currentTime = pct * duration;
+        setCurrentTime(pct * duration);
+    }, [modalVideoRef, duration]);
+
+    const seekPct = duration > 0 ? (currentTime / duration) * 100 : 0;
+
     if (!isOpen) return null;
 
     return createPortal(
@@ -210,7 +252,7 @@ export default function SeriesDemoModal({
                         </div>
 
                         <div
-                            className="relative z-[105] w-full max-w-7xl mx-auto px-6 flex items-center h-full gap-8 lg:gap-14 cursor-default"
+                            className="relative z-[105] w-full max-w-7xl mx-auto px-6 flex items-center h-full gap-3 lg:gap-4 cursor-default"
                             onClick={e => e.stopPropagation()}
                         >
                             {/* ── LEFT: Thumbnail Strip ── */}
@@ -273,35 +315,66 @@ export default function SeriesDemoModal({
                                                     playsInline
                                                     loop={resolvedPlaylist.length === 1}
                                                 />
-                                                {!modalIsPlaying && (
-                                                    <div
-                                                        className="absolute inset-0 flex items-center justify-center z-[10] cursor-pointer bg-black/20"
-                                                        onClick={e => { e.stopPropagation(); toggleModalPlay(); }}
-                                                    >
-                                                        <div className="w-20 h-20 rounded-full bg-black/50 backdrop-blur-md border border-white/30 flex items-center justify-center text-white hover:scale-110 transition-transform">
-                                                            <svg className="w-10 h-10 fill-white ml-1" viewBox="0 0 24 24">
-                                                                <path d="M8 5v14l11-7z" />
-                                                            </svg>
-                                                        </div>
-                                                    </div>
-                                                )}
                                             </>
                                         )}
 
-                                        {/* Rail item: no video source. The static image + progress bar is enough */}
+                                        {/* Rail item gradient overlay */}
                                         {isRailActive && activeVideoUrl === null && (
-                                            // Fade overlay so the poster doesn't look too flat
                                             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent z-[3] pointer-events-none" />
                                         )}
 
-                                        {/* Mute button — only for carousel items with audio */}
-                                        {!isRailActive && activeVideoUrl && modalHasAudio && (
-                                            <button
-                                                onClick={toggleModalMute}
-                                                className="absolute bottom-10 right-4 z-20 w-10 h-10 rounded-full bg-black/50 border border-white/20 backdrop-blur-md flex items-center justify-center text-white hover:bg-black/70 transition-colors"
-                                            >
-                                                {modalMuted ? <VolumeX size={16} /> : <Volume2 size={16} />}
-                                            </button>
+                                        {/* Video controls — seekbar + play/pause + time + mute (carousel items only) */}
+                                        {!isRailActive && activeVideoUrl && (
+                                            <div className="absolute bottom-0 left-0 right-0 z-[20] px-3 pb-3 pt-8 bg-gradient-to-t from-black/90 via-black/50 to-transparent">
+                                                {/* Seekbar */}
+                                                <div
+                                                    className="relative h-[4px] bg-white/30 rounded-full cursor-pointer mb-3 group/seek"
+                                                    onClick={handleSeek}
+                                                >
+                                                    {/* Filled portion */}
+                                                    <div
+                                                        className="absolute inset-y-0 left-0 bg-[#009cdb] rounded-full pointer-events-none"
+                                                        style={{ width: `${seekPct}%` }}
+                                                    />
+                                                    {/* Scrubber dot */}
+                                                    <div
+                                                        className="absolute top-1/2 -translate-y-1/2 w-3 h-3 bg-white rounded-full shadow-md opacity-0 group-hover/seek:opacity-100 transition-opacity pointer-events-none"
+                                                        style={{ left: `calc(${seekPct}% - 6px)` }}
+                                                    />
+                                                </div>
+
+                                                {/* Controls row */}
+                                                <div className="flex items-center gap-2">
+                                                    {/* Play / Pause */}
+                                                    <button
+                                                        onClick={e => { e.stopPropagation(); toggleModalPlay(); }}
+                                                        className="w-7 h-7 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors flex-shrink-0"
+                                                    >
+                                                        {modalIsPlaying
+                                                            ? <Pause size={12} fill="white" />
+                                                            : <Play size={12} fill="white" className="ml-[1px]" />
+                                                        }
+                                                    </button>
+
+                                                    {/* Time display */}
+                                                    <span className="text-[10px] text-white/70 tabular-nums flex-shrink-0">
+                                                        {formatTime(currentTime)}
+                                                        {duration > 0 && <> / {formatTime(duration)}</>}
+                                                    </span>
+
+                                                    <div className="flex-1" />
+
+                                                    {/* Mute */}
+                                                    {modalHasAudio && (
+                                                        <button
+                                                            onClick={e => { e.stopPropagation(); toggleModalMute(); }}
+                                                            className="w-7 h-7 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors flex-shrink-0"
+                                                        >
+                                                            {modalMuted ? <VolumeX size={12} /> : <Volume2 size={12} />}
+                                                        </button>
+                                                    )}
+                                                </div>
+                                            </div>
                                         )}
 
                                         {/* 2.5s Progress bar — only for rail (static) items */}
