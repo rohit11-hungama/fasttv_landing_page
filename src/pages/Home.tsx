@@ -67,7 +67,7 @@ const Home = () => {
                     "@type": "VideoGallery",
                     "name": "FastTV - Premium Micro Dramas",
                     "description": "Watch premium 90-second drama episodes. Stories worth your time.",
-                    "url": "https://fasttv.com"
+                    "url": "https://fasttv.app"
                 }}
             />
             <ScrollAnimation>

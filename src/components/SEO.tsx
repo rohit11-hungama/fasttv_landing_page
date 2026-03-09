@@ -46,7 +46,7 @@ export default function SEO({
         setMeta('property', 'og:title', `${title} | FastTV`);
         setMeta('property', 'og:description', description);
         setMeta('property', 'og:type', ogType);
-        setMeta('property', 'og:url', `https://fasttv.com${canonicalPath}`);
+        setMeta('property', 'og:url', `https://fasttv.app${canonicalPath}`);
         setMeta('property', 'og:image', ogImage);
 
         // Twitter Card
@@ -61,7 +61,7 @@ export default function SEO({
             canonical.setAttribute('rel', 'canonical');
             document.head.appendChild(canonical);
         }
-        canonical.setAttribute('href', `https://fasttv.com${canonicalPath}`);
+        canonical.setAttribute('href', `https://fasttv.app${canonicalPath}`);
 
         // Structured Data
         const existingScript = document.getElementById('page-structured-data');
